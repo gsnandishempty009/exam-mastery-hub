@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import StudentSidebar from "@/components/dashboard/StudentSidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,7 +13,10 @@ import {
   Calendar,
   CheckCircle,
   Target,
+  Loader2,
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 const upcomingExams = [
   { id: 1, title: "Mathematics Final", date: "Jan 15, 2026", time: "10:00 AM", duration: "2 hours" },
@@ -26,6 +31,48 @@ const recentResults = [
 ];
 
 const StudentDashboard = () => {
+  const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+  const [profile, setProfile] = useState<{ full_name: string | null }>({ full_name: null });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate("/login");
+    }
+  }, [user, authLoading, navigate]);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user) return;
+
+      const { data } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (data) {
+        setProfile(data);
+      }
+      setLoading(false);
+    };
+
+    if (user) {
+      fetchProfile();
+    }
+  }, [user]);
+
+  if (authLoading || loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  const displayName = profile.full_name || user?.email?.split("@")[0] || "Student";
+
   return (
     <div className="min-h-screen bg-background">
       <StudentSidebar />
@@ -33,7 +80,7 @@ const StudentDashboard = () => {
       <main className="ml-64 p-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="font-display text-3xl font-bold mb-2">Welcome back, John! 👋</h1>
+          <h1 className="font-display text-3xl font-bold mb-2">Welcome back, {displayName}! 👋</h1>
           <p className="text-muted-foreground">Here's what's happening with your learning journey.</p>
         </div>
 
