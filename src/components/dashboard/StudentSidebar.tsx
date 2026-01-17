@@ -4,11 +4,8 @@ import {
   GraduationCap,
   LayoutDashboard,
   BookOpen,
-  Trophy,
-  BarChart3,
   Settings,
   LogOut,
-  Clock,
   FileText,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -16,11 +13,8 @@ import { supabase } from "@/integrations/supabase/client";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/student/dashboard" },
-  { icon: BookOpen, label: "Available Exams", path: "/student/exams" },
-  { icon: FileText, label: "My Results", path: "/student/results" },
-  { icon: Clock, label: "Practice Tests", path: "/student/practice" },
-  { icon: BarChart3, label: "Progress", path: "/student/progress" },
-  { icon: Trophy, label: "Leaderboard", path: "/student/leaderboard" },
+  { icon: BookOpen, label: "Study Notes", path: "/student/notes" },
+  { icon: FileText, label: "Question Papers", path: "/student/question-papers" },
   { icon: Settings, label: "Settings", path: "/student/settings" },
 ];
 
