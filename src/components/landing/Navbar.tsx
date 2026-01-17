@@ -35,6 +35,9 @@ const Navbar = () => {
 
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center gap-3">
+            <Link to="/admin/login">
+              <Button variant="outline" size="sm">Admin</Button>
+            </Link>
             <Link to="/login">
               <Button variant="ghost">Sign In</Button>
             </Link>
@@ -66,8 +69,11 @@ const Navbar = () => {
                 Testimonials
               </a>
               <div className="flex flex-col gap-2 pt-4 border-t border-border">
+                <Link to="/admin/login">
+                  <Button variant="outline" className="w-full">Admin Login</Button>
+                </Link>
                 <Link to="/login">
-                  <Button variant="outline" className="w-full">Sign In</Button>
+                  <Button variant="ghost" className="w-full">Sign In</Button>
                 </Link>
                 <Link to="/register">
                   <Button variant="hero" className="w-full">Get Started</Button>
