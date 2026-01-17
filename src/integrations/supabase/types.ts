@@ -14,6 +14,139 @@ export type Database = {
   }
   public: {
     Tables: {
+      academic_years: {
+        Row: {
+          created_at: string
+          id: string
+          name: string
+          year_number: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          name: string
+          year_number: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          name?: string
+          year_number?: number
+        }
+        Relationships: []
+      }
+      branches: {
+        Row: {
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      modules: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          module_number: number
+          subject_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          module_number: number
+          subject_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          module_number?: number
+          subject_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "modules_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notes: {
+        Row: {
+          created_at: string
+          description: string | null
+          file_name: string
+          file_size: number | null
+          file_url: string
+          id: string
+          module_id: string
+          title: string
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          file_name: string
+          file_size?: number | null
+          file_url: string
+          id?: string
+          module_id: string
+          title: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          file_name?: string
+          file_size?: number | null
+          file_url?: string
+          id?: string
+          module_id?: string
+          title?: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notes_module_id_fkey"
+            columns: ["module_id"]
+            isOneToOne: false
+            referencedRelation: "modules"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -40,6 +173,117 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      question_papers: {
+        Row: {
+          branch_id: string
+          created_at: string
+          exam_type: string
+          exam_year: number
+          file_name: string
+          file_size: number | null
+          file_url: string
+          id: string
+          subject_id: string | null
+          title: string
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          branch_id: string
+          created_at?: string
+          exam_type?: string
+          exam_year: number
+          file_name: string
+          file_size?: number | null
+          file_url: string
+          id?: string
+          subject_id?: string | null
+          title: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          branch_id?: string
+          created_at?: string
+          exam_type?: string
+          exam_year?: number
+          file_name?: string
+          file_size?: number | null
+          file_url?: string
+          id?: string
+          subject_id?: string | null
+          title?: string
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "question_papers_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "question_papers_subject_id_fkey"
+            columns: ["subject_id"]
+            isOneToOne: false
+            referencedRelation: "subjects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subjects: {
+        Row: {
+          academic_year_id: string
+          branch_id: string
+          code: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          total_modules: number
+          updated_at: string
+        }
+        Insert: {
+          academic_year_id: string
+          branch_id: string
+          code: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          total_modules?: number
+          updated_at?: string
+        }
+        Update: {
+          academic_year_id?: string
+          branch_id?: string
+          code?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          total_modules?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subjects_academic_year_id_fkey"
+            columns: ["academic_year_id"]
+            isOneToOne: false
+            referencedRelation: "academic_years"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subjects_branch_id_fkey"
+            columns: ["branch_id"]
+            isOneToOne: false
+            referencedRelation: "branches"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
