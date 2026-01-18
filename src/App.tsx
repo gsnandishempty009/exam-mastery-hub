@@ -18,6 +18,7 @@ import AdminSubjects from "./pages/AdminSubjects";
 import AdminModules from "./pages/AdminModules";
 import AdminNotes from "./pages/AdminNotes";
 import AdminQuestionPapers from "./pages/AdminQuestionPapers";
+import AdminSettings from "./pages/AdminSettings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/admin/modules" element={<AdminModules />} />
             <Route path="/admin/notes" element={<AdminNotes />} />
             <Route path="/admin/question-papers" element={<AdminQuestionPapers />} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

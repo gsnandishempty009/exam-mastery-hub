@@ -76,6 +76,11 @@ const AdminModules = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!formData.title || !formData.subject_id) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
     if (editingModule) {
       const { error } = await supabase
         .from("modules")
@@ -83,24 +88,25 @@ const AdminModules = () => {
         .eq("id", editingModule.id);
 
       if (error) {
-        toast.error("Failed to update module");
+        toast.error("Failed to update module: " + error.message);
       } else {
         toast.success("Module updated successfully");
         fetchData();
+        setIsDialogOpen(false);
+        resetForm();
       }
     } else {
       const { error } = await supabase.from("modules").insert([formData]);
 
       if (error) {
-        toast.error("Failed to create module");
+        toast.error("Failed to create module: " + error.message);
       } else {
         toast.success("Module created successfully");
         fetchData();
+        setIsDialogOpen(false);
+        resetForm();
       }
     }
-
-    setIsDialogOpen(false);
-    resetForm();
   };
 
   const resetForm = () => {

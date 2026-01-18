@@ -105,30 +105,48 @@ const AdminQuestionPapers = () => {
   };
 
   const uploadFile = async (file: File): Promise<{ url: string; name: string; size: number } | null> => {
-    const fileExt = file.name.split(".").pop();
-    const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-    const filePath = `papers/${fileName}`;
+    try {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      const filePath = `papers/${fileName}`;
 
-    const { error: uploadError } = await supabase.storage
-      .from("question-papers")
-      .upload(filePath, file);
+      // Try uploading to the storage bucket
+      const { error: uploadError } = await supabase.storage
+        .from("question-papers")
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: false,
+        });
 
-    if (uploadError) {
-      toast.error("Failed to upload file");
+      if (uploadError) {
+        console.error("Upload error:", uploadError);
+        toast.error("Failed to upload file: " + uploadError.message);
+        return null;
+      }
+
+      // Get public URL
+      const { data: urlData } = supabase.storage.from("question-papers").getPublicUrl(filePath);
+
+      return {
+        url: urlData.publicUrl,
+        name: file.name,
+        size: file.size,
+      };
+    } catch (error: any) {
+      console.error("Upload exception:", error);
+      toast.error("Upload error: " + error.message);
       return null;
     }
-
-    const { data: urlData } = supabase.storage.from("question-papers").getPublicUrl(filePath);
-
-    return {
-      url: urlData.publicUrl,
-      name: file.name,
-      size: file.size,
-    };
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!formData.title || !formData.branch_id) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
     setUploading(true);
 
     try {
@@ -184,8 +202,8 @@ const AdminQuestionPapers = () => {
       fetchData();
       setIsDialogOpen(false);
       resetForm();
-    } catch (error) {
-      toast.error("An error occurred");
+    } catch (error: any) {
+      toast.error("Error: " + (error.message || "An error occurred"));
     } finally {
       setUploading(false);
     }

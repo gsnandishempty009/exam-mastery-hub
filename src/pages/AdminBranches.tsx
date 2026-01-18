@@ -56,6 +56,11 @@ const AdminBranches = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!formData.name || !formData.code) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+    
     if (editingBranch) {
       const { error } = await supabase
         .from("branches")
@@ -63,25 +68,26 @@ const AdminBranches = () => {
         .eq("id", editingBranch.id);
       
       if (error) {
-        toast.error("Failed to update branch");
+        toast.error("Failed to update branch: " + error.message);
       } else {
         toast.success("Branch updated successfully");
         fetchBranches();
+        setIsDialogOpen(false);
+        setEditingBranch(null);
+        setFormData({ name: "", code: "", description: "" });
       }
     } else {
       const { error } = await supabase.from("branches").insert([formData]);
       
       if (error) {
-        toast.error("Failed to create branch");
+        toast.error("Failed to create branch: " + error.message);
       } else {
         toast.success("Branch created successfully");
         fetchBranches();
+        setIsDialogOpen(false);
+        setFormData({ name: "", code: "", description: "" });
       }
     }
-    
-    setIsDialogOpen(false);
-    setEditingBranch(null);
-    setFormData({ name: "", code: "", description: "" });
   };
 
   const handleEdit = (branch: Branch) => {

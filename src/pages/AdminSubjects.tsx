@@ -89,31 +89,45 @@ const AdminSubjects = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!formData.name || !formData.code || !formData.branch_id) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+
+    const submitData = {
+      name: formData.name,
+      code: formData.code,
+      description: formData.description,
+      branch_id: formData.branch_id,
+      ...(formData.academic_year_id && { academic_year_id: formData.academic_year_id }),
+    };
+
     if (editingSubject) {
       const { error } = await supabase
         .from("subjects")
-        .update(formData)
+        .update(submitData)
         .eq("id", editingSubject.id);
 
       if (error) {
-        toast.error("Failed to update subject");
+        toast.error("Failed to update subject: " + error.message);
       } else {
         toast.success("Subject updated successfully");
         fetchData();
+        setIsDialogOpen(false);
+        resetForm();
       }
     } else {
-      const { error } = await supabase.from("subjects").insert([formData]);
+      const { error } = await supabase.from("subjects").insert([submitData]);
 
       if (error) {
-        toast.error("Failed to create subject");
+        toast.error("Failed to create subject: " + error.message);
       } else {
         toast.success("Subject created successfully");
         fetchData();
+        setIsDialogOpen(false);
+        resetForm();
       }
     }
-
-    setIsDialogOpen(false);
-    resetForm();
   };
 
   const resetForm = () => {

@@ -1,4 +1,5 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import {
   GraduationCap,
   LayoutDashboard,
@@ -24,6 +25,23 @@ const menuItems = [
 
 const AdminSidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/admin/login");
+  };
+
+  // Get user initials
+  const userEmail = user?.email || "admin@exammaster.com";
+  const userName = user?.user_metadata?.full_name || userEmail.split("@")[0];
+  const initials = userName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-foreground text-background flex flex-col">
@@ -68,20 +86,20 @@ const AdminSidebar = () => {
       <div className="p-4 border-t border-background/10">
         <div className="flex items-center gap-3 p-3 rounded-xl bg-background/5 mb-3">
           <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold">
-            AD
+            {initials}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="font-semibold text-sm truncate">Admin User</p>
-            <p className="text-xs text-background/50 truncate">admin@exammaster.com</p>
+            <p className="font-semibold text-sm truncate">{userName}</p>
+            <p className="text-xs text-background/50 truncate">{userEmail}</p>
           </div>
         </div>
-        <Link
-          to="/admin/login"
-          className="flex items-center gap-3 px-4 py-3 rounded-xl text-background/70 hover:bg-destructive/20 hover:text-destructive transition-all"
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-background/70 hover:bg-destructive/20 hover:text-destructive transition-all"
         >
           <LogOut className="w-5 h-5" />
           <span className="font-medium">Logout</span>
-        </Link>
+        </button>
       </div>
     </aside>
   );
