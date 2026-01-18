@@ -2,23 +2,23 @@ import { Link, useLocation } from "react-router-dom";
 import {
   GraduationCap,
   LayoutDashboard,
-  Users,
+  GitBranch,
   BookOpen,
+  Layers,
   FileText,
-  BarChart3,
+  FileQuestion,
   Settings,
   LogOut,
   Shield,
-  HelpCircle,
 } from "lucide-react";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/admin/dashboard" },
-  { icon: Users, label: "Students", path: "/admin/students" },
-  { icon: BookOpen, label: "Exams", path: "/admin/exams" },
-  { icon: FileText, label: "Questions", path: "/admin/questions" },
-  { icon: BarChart3, label: "Reports", path: "/admin/reports" },
-  { icon: HelpCircle, label: "Support", path: "/admin/support" },
+  { icon: GitBranch, label: "Branches", path: "/admin/branches" },
+  { icon: BookOpen, label: "Subjects", path: "/admin/subjects" },
+  { icon: Layers, label: "Modules", path: "/admin/modules" },
+  { icon: FileText, label: "Notes", path: "/admin/notes" },
+  { icon: FileQuestion, label: "Question Papers", path: "/admin/question-papers" },
   { icon: Settings, label: "Settings", path: "/admin/settings" },
 ];
 
