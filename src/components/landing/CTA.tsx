@@ -14,15 +14,15 @@ const CTA = () => {
           <div className="relative z-10 text-center max-w-3xl mx-auto">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-primary-foreground text-sm font-medium mb-6">
               <Sparkles className="w-4 h-4" />
-              Start Your Journey Today
+              Start Your Learning Journey
             </div>
 
             <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-primary-foreground mb-6">
-              Ready to Transform Your Exam Preparation?
+              Ready to Access Quality Study Materials?
             </h2>
 
             <p className="text-lg text-primary-foreground/80 mb-8">
-              Join over 50,000 students who are already using ExamMaster to achieve their academic goals. Start for free today.
+              Join students who are already using our platform to access notes, question papers, and study guides. Sign up for free today.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">

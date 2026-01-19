@@ -16,7 +16,7 @@ const Navbar = () => {
               <GraduationCap className="w-6 h-6 text-primary-foreground" />
             </div>
             <span className="font-display font-bold text-xl text-foreground">
-              Exam<span className="text-primary">Master</span>
+              Study<span className="text-primary">Hub</span>
             </span>
           </Link>
 
