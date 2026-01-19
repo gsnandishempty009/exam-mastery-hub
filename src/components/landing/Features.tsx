@@ -1,40 +1,40 @@
-import { Brain, BarChart3, Clock, Shield, BookOpen, Trophy } from "lucide-react";
+import { FolderTree, BookOpen, FileText, Download, Search, Lock } from "lucide-react";
 
 const features = [
   {
-    icon: Brain,
-    title: "AI-Powered Learning",
-    description: "Smart algorithms adapt to your learning style and identify areas that need improvement.",
+    icon: FolderTree,
+    title: "Organized by Branch",
+    description: "Study materials organized by academic branches like MCA, BCA, BTech for easy navigation.",
     color: "primary",
-  },
-  {
-    icon: BarChart3,
-    title: "Detailed Analytics",
-    description: "Track your progress with comprehensive reports and performance insights.",
-    color: "accent",
-  },
-  {
-    icon: Clock,
-    title: "Timed Practice Tests",
-    description: "Simulate real exam conditions with customizable timed assessments.",
-    color: "warning",
-  },
-  {
-    icon: Shield,
-    title: "Secure Platform",
-    description: "Your data and exam results are protected with enterprise-grade security.",
-    color: "success",
   },
   {
     icon: BookOpen,
-    title: "Vast Question Bank",
-    description: "Access thousands of questions across multiple subjects and difficulty levels.",
+    title: "Comprehensive Notes",
+    description: "Access detailed study notes for every module in each subject, curated by experts.",
+    color: "accent",
+  },
+  {
+    icon: FileText,
+    title: "Previous Year Papers",
+    description: "Download question papers from previous years to prepare effectively for exams.",
+    color: "warning",
+  },
+  {
+    icon: Search,
+    title: "Easy to Navigate",
+    description: "Find what you need quickly with our intuitive branch, year, subject, and module filters.",
+    color: "success",
+  },
+  {
+    icon: Download,
+    title: "Instant Downloads",
+    description: "Download notes and question papers instantly in PDF format for offline study.",
     color: "primary",
   },
   {
-    icon: Trophy,
-    title: "Gamified Learning",
-    description: "Earn badges, climb leaderboards, and stay motivated on your learning journey.",
+    icon: Lock,
+    title: "Secure Access",
+    description: "Your data is protected with secure authentication and role-based access control.",
     color: "accent",
   },
 ];
@@ -46,10 +46,10 @@ const Features = () => {
         <div className="text-center mb-16">
           <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">
             Everything You Need to{" "}
-            <span className="text-gradient">Excel</span>
+            <span className="text-gradient">Succeed</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Our platform combines cutting-edge technology with proven learning methods to help you achieve your academic goals.
+            Our platform provides all the study resources you need, organized systematically by branch, year, subject, and module.
           </p>
         </div>
 
