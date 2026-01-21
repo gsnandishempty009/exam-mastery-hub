@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAdminProtection } from "@/hooks/useAdminProtection";
 import AdminSidebar from "@/components/dashboard/AdminSidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -39,6 +40,8 @@ interface Note {
   file_url: string;
   file_size: number | null;
   module_id: string;
+  pdf_url?: string | null;
+  pdf_file_name?: string | null;
 }
 
 interface Module {
@@ -55,6 +58,7 @@ interface Subject {
 }
 
 const AdminNotes = () => {
+  const { isAdmin, authLoading } = useAdminProtection();
   const [notes, setNotes] = useState<Note[]>([]);
   const [modules, setModules] = useState<Module[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -63,15 +67,19 @@ const AdminNotes = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingNote, setEditingNote] = useState<Note | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [pdfInputType, setPdfInputType] = useState<"file" | "url">("file");
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     module_id: "",
+    pdf_url: "",
   });
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (!authLoading && isAdmin) {
+      fetchData();
+    }
+  }, [authLoading, isAdmin]);
 
   const fetchData = async () => {
     const [notesRes, modulesRes, subjectsRes] = await Promise.all([
@@ -139,7 +147,12 @@ const AdminNotes = () => {
 
     try {
       if (editingNote) {
-        let updateData: any = { ...formData };
+        let updateData: any = { 
+          title: formData.title,
+          description: formData.description,
+          module_id: formData.module_id,
+          pdf_url: formData.pdf_url || null,
+        };
 
         if (selectedFile) {
           const fileData = await uploadFile(selectedFile);
@@ -161,26 +174,42 @@ const AdminNotes = () => {
         if (error) throw error;
         toast.success("Note updated successfully");
       } else {
-        if (!selectedFile) {
-          toast.error("Please select a file to upload");
+        if (!selectedFile && !formData.pdf_url) {
+          toast.error("Please either select a file to upload or provide a PDF URL");
           setUploading(false);
           return;
         }
 
-        const fileData = await uploadFile(selectedFile);
-        if (!fileData) {
-          setUploading(false);
-          return;
-        }
+        let uploadedData: any = {
+          title: formData.title,
+          description: formData.description,
+          module_id: formData.module_id,
+          pdf_url: formData.pdf_url || null,
+        };
 
-        const { error } = await supabase.from("notes").insert([
-          {
-            ...formData,
+        if (selectedFile) {
+          const fileData = await uploadFile(selectedFile);
+          if (!fileData) {
+            setUploading(false);
+            return;
+          }
+          uploadedData = {
+            ...uploadedData,
             file_name: fileData.name,
             file_url: fileData.url,
             file_size: fileData.size,
-          },
-        ]);
+          };
+        } else {
+          // If no file but URL provided, use a placeholder file entry
+          uploadedData = {
+            ...uploadedData,
+            file_name: "PDF from URL",
+            file_url: formData.pdf_url,
+            file_size: null,
+          };
+        }
+
+        const { error } = await supabase.from("notes").insert([uploadedData]);
 
         if (error) throw error;
         toast.success("Note created successfully");
@@ -199,10 +228,12 @@ const AdminNotes = () => {
   const resetForm = () => {
     setEditingNote(null);
     setSelectedFile(null);
+    setPdfInputType("file");
     setFormData({
       title: "",
       description: "",
       module_id: "",
+      pdf_url: "",
     });
   };
 
@@ -212,6 +243,7 @@ const AdminNotes = () => {
       title: note.title,
       description: note.description || "",
       module_id: note.module_id,
+      pdf_url: note.pdf_url || "",
     });
     setIsDialogOpen(true);
   };
@@ -324,6 +356,59 @@ const AdminNotes = () => {
                     placeholder="Brief description of the notes"
                   />
                 </div>
+                <div className="space-y-2">
+                  <Label>PDF Link (Optional)</Label>
+                  <div className="flex gap-2 mb-2">
+                    <Button
+                      type="button"
+                      variant={pdfInputType === "file" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setPdfInputType("file")}
+                      className="flex-1"
+                    >
+                      Upload PDF File
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={pdfInputType === "url" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setPdfInputType("url")}
+                      className="flex-1"
+                    >
+                      Paste URL
+                    </Button>
+                  </div>
+                  {pdfInputType === "file" ? (
+                    <div>
+                      <Input
+                        type="file"
+                        accept=".pdf"
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files[0]) {
+                            setSelectedFile(e.target.files[0]);
+                          }
+                        }}
+                        className="cursor-pointer"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Upload a PDF file that will be stored in the system
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      <Input
+                        id="pdf_url"
+                        type="url"
+                        value={formData.pdf_url}
+                        onChange={(e) => setFormData({ ...formData, pdf_url: e.target.value })}
+                        placeholder="e.g., https://example.com/notes.pdf"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Enter the URL of an external PDF to link with this note
+                      </p>
+                    </div>
+                  )}
+                </div>
                 <Button type="submit" className="w-full" disabled={uploading}>
                   {uploading ? (
                     <>
@@ -360,6 +445,7 @@ const AdminNotes = () => {
                     <TableHead>Title</TableHead>
                     <TableHead>Module</TableHead>
                     <TableHead>File</TableHead>
+                    <TableHead>PDF URL</TableHead>
                     <TableHead>Size</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -379,6 +465,21 @@ const AdminNotes = () => {
                           {note.file_name}
                           <ExternalLink className="w-3 h-3" />
                         </a>
+                      </TableCell>
+                      <TableCell>
+                        {note.pdf_url ? (
+                          <a
+                            href={note.pdf_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-accent hover:underline"
+                          >
+                            View PDF
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">-</span>
+                        )}
                       </TableCell>
                       <TableCell>{formatFileSize(note.file_size)}</TableCell>
                       <TableCell className="text-right">

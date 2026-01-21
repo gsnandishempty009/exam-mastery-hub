@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAdminProtection } from "@/hooks/useAdminProtection";
 import AdminSidebar from "@/components/dashboard/AdminSidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -31,10 +32,13 @@ const AdminDashboard = () => {
     questionPapers: 0,
   });
   const [loading, setLoading] = useState(true);
+  const { isAdmin, authLoading } = useAdminProtection();
 
   useEffect(() => {
-    fetchStats();
-  }, []);
+    if (!authLoading && isAdmin) {
+      fetchStats();
+    }
+  }, [authLoading, isAdmin]);
 
   const fetchStats = async () => {
     const [branchesRes, subjectsRes, modulesRes, notesRes, papersRes] = await Promise.all([

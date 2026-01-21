@@ -18,6 +18,7 @@ import {
   FolderOpen,
   GraduationCap,
   Calendar,
+  ExternalLink,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -41,6 +42,8 @@ interface QuestionPaper {
   exam_type: string;
   file_url: string;
   file_name: string;
+  pdf_url?: string;
+  pdf_file_name?: string;
   created_at: string;
   subjects?: Subject | null;
 }
@@ -56,6 +59,7 @@ const StudentQuestionPapers = () => {
   const [selectedExamYear, setSelectedExamYear] = useState<string>("");
 
   const [loading, setLoading] = useState(true);
+  const [papersLoading, setPapersLoading] = useState(false);
   const [availableYears, setAvailableYears] = useState<number[]>([]);
 
   useEffect(() => {
@@ -67,13 +71,23 @@ const StudentQuestionPapers = () => {
   // Fetch branches on mount
   useEffect(() => {
     const fetchBranches = async () => {
-      const { data } = await supabase
-        .from("branches")
-        .select("*")
-        .order("name");
+      try {
+        const { data, error } = await supabase
+          .from("branches")
+          .select("*")
+          .order("name");
 
-      if (data) setBranches(data);
-      setLoading(false);
+        if (error) {
+          console.error("Error fetching branches:", error);
+        } else if (data) {
+          console.log("Branches fetched:", data);
+          setBranches(data);
+        }
+      } catch (err) {
+        console.error("Unexpected error fetching branches:", err);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchBranches();
@@ -87,14 +101,24 @@ const StudentQuestionPapers = () => {
         return;
       }
 
-      const { data } = await supabase
-        .from("question_papers")
-        .select("exam_year")
-        .eq("branch_id", selectedBranch);
+      try {
+        const { data, error } = await supabase
+          .from("question_papers")
+          .select("exam_year")
+          .eq("branch_id", selectedBranch);
 
-      if (data) {
-        const years = [...new Set(data.map((d) => d.exam_year))].sort((a, b) => b - a);
-        setAvailableYears(years);
+        if (error) {
+          console.error("Error fetching available years:", error);
+          setAvailableYears([]);
+        } else if (data) {
+          console.log("Available years data:", data);
+          const years = [...new Set(data.map((d) => d.exam_year))].sort((a, b) => b - a);
+          console.log("Unique years:", years);
+          setAvailableYears(years);
+        }
+      } catch (err) {
+        console.error("Unexpected error fetching available years:", err);
+        setAvailableYears([]);
       }
     };
 
@@ -106,21 +130,37 @@ const StudentQuestionPapers = () => {
     const fetchQuestionPapers = async () => {
       if (!selectedBranch) {
         setQuestionPapers([]);
+        setPapersLoading(false);
         return;
       }
 
-      let query = supabase
-        .from("question_papers")
-        .select("*, subjects(id, name, code)")
-        .eq("branch_id", selectedBranch)
-        .order("exam_year", { ascending: false });
+      setPapersLoading(true);
+      try {
+        let query = supabase
+          .from("question_papers")
+          .select("*, subjects(id, name, code)")
+          .eq("branch_id", selectedBranch)
+          .order("exam_year", { ascending: false });
 
-      if (selectedExamYear) {
-        query = query.eq("exam_year", parseInt(selectedExamYear));
+        if (selectedExamYear) {
+          query = query.eq("exam_year", parseInt(selectedExamYear));
+        }
+
+        const { data, error } = await query;
+        
+        if (error) {
+          console.error("Error fetching question papers:", error);
+          setQuestionPapers([]);
+        } else {
+          console.log("Question papers fetched:", data);
+          setQuestionPapers(data || []);
+        }
+      } catch (err) {
+        console.error("Unexpected error fetching question papers:", err);
+        setQuestionPapers([]);
+      } finally {
+        setPapersLoading(false);
       }
-
-      const { data } = await query;
-      setQuestionPapers(data || []);
     };
 
     fetchQuestionPapers();
@@ -205,7 +245,7 @@ const StudentQuestionPapers = () => {
               <div>
                 <label className="text-sm font-medium mb-2 block">Exam Year</label>
                 <Select
-                  value={selectedExamYear}
+                  value={selectedExamYear || ""}
                   onValueChange={setSelectedExamYear}
                   disabled={!selectedBranch || availableYears.length === 0}
                 >
@@ -213,7 +253,6 @@ const StudentQuestionPapers = () => {
                     <SelectValue placeholder="All Years" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Years</SelectItem>
                     {availableYears.map((year) => (
                       <SelectItem key={year} value={year.toString()}>
                         {year}
@@ -271,6 +310,13 @@ const StudentQuestionPapers = () => {
               ))
             )}
           </div>
+        ) : papersLoading ? (
+          <Card className="border-0 shadow-lg">
+            <CardContent className="p-12 flex items-center justify-center gap-3">
+              <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              <p className="text-muted-foreground">Loading question papers...</p>
+            </CardContent>
+          </Card>
         ) : questionPapers.length > 0 ? (
           <div className="space-y-8">
             {Object.entries(papersByYear)
@@ -287,30 +333,44 @@ const StudentQuestionPapers = () => {
                   <div className="grid gap-4">
                     {papers.map((paper) => (
                       <Card key={paper.id} className="border-0 shadow-lg hover:shadow-xl transition-all">
-                        <CardContent className="p-6 flex items-center gap-4">
-                          <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center">
-                            <FileQuestion className="w-6 h-6 text-accent" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-semibold truncate">{paper.title}</h4>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              {paper.subjects && (
-                                <span>{paper.subjects.name}</span>
-                              )}
-                              <span>•</span>
-                              <span>{paper.exam_type}</span>
-                              <span>•</span>
-                              <span>{paper.exam_year}</span>
+                        <CardContent className="p-6">
+                          <div className="flex items-start gap-4">
+                            <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
+                              <FileQuestion className="w-6 h-6 text-accent" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-semibold truncate">{paper.title}</h4>
+                              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+                                {paper.subjects && (
+                                  <span>{paper.subjects.name}</span>
+                                )}
+                                <span>•</span>
+                                <span>{paper.exam_type}</span>
+                                <span>•</span>
+                                <span>{paper.exam_year}</span>
+                              </div>
+                              <div className="flex gap-2 flex-wrap">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => handleDownload(paper.file_url)}
+                                >
+                                  <Download className="w-4 h-4 mr-2" />
+                                  Download
+                                </Button>
+                                {paper.pdf_url && (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => window.open(paper.pdf_url, "_blank")}
+                                  >
+                                    <ExternalLink className="w-4 h-4 mr-2" />
+                                    View PDF
+                                  </Button>
+                                )}
+                              </div>
                             </div>
                           </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDownload(paper.file_url)}
-                          >
-                            <Download className="w-4 h-4 mr-2" />
-                            Download
-                          </Button>
                         </CardContent>
                       </Card>
                     ))}

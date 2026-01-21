@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GraduationCap, Mail, Lock, ArrowRight, Eye, EyeOff, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 const AdminLogin = () => {
   const [email, setEmail] = useState("");
@@ -13,28 +15,119 @@ const AdminLogin = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { signIn } = useAuth();
+  const [loginAttempted, setLoginAttempted] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+  // Check admin status after login
+  useEffect(() => {
+    if (loginAttempted) {
+      checkAdminStatus();
+    }
+  }, [loginAttempted]);
 
-    // Simulate admin login - in production, connect to backend with proper auth
-    setTimeout(() => {
-      if (email && password) {
+  const checkAdminStatus = async () => {
+    try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Error",
+          description: "Unable to verify user. Please try again.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        setLoginAttempted(false);
+        return;
+      }
+
+      // Log the user ID for debugging
+      console.log("Current user ID:", user.id);
+      console.log("Current user email:", user.email);
+
+      // Fetch user role directly from database
+      const { data: roleData, error: roleError } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      console.log("Role data:", roleData);
+      console.log("Role error:", roleError);
+
+      if (roleError || !roleData) {
+        toast({
+          title: "Error",
+          description: `Unable to verify admin status. Please ensure your user ID (${user.id}) is in the user_roles table.`,
+          variant: "destructive",
+        });
+        await supabase.auth.signOut();
+        setIsLoading(false);
+        setLoginAttempted(false);
+        return;
+      }
+
+      if (roleData.role === "admin") {
         toast({
           title: "Welcome, Admin!",
           description: "You have successfully logged in.",
         });
+        setLoginAttempted(false);
         navigate("/admin/dashboard");
       } else {
         toast({
-          title: "Error",
-          description: "Please fill in all fields.",
+          title: "Access Denied",
+          description: "Only admins can access the admin dashboard. You have been logged out.",
           variant: "destructive",
         });
+        await supabase.auth.signOut();
+        setEmail("");
+        setPassword("");
+        setIsLoading(false);
+        setLoginAttempted(false);
       }
+    } catch (error) {
+      console.error("Error:", error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+      await supabase.auth.signOut();
       setIsLoading(false);
-    }, 1000);
+      setLoginAttempted(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email || !password) {
+      toast({
+        title: "Error",
+        description: "Please fill in all fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
+    // Sign in the user
+    const { error } = await signIn(email, password);
+
+    if (error) {
+      toast({
+        title: "Login Failed",
+        description: error.message || "Invalid email or password.",
+        variant: "destructive",
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    // Trigger admin status check
+    setLoginAttempted(true);
   };
 
   return (
@@ -67,7 +160,7 @@ const AdminLogin = () => {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="admin@exammaster.com"
+                  placeholder="admin@studyhub.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="pl-10 h-12"

@@ -2,24 +2,24 @@ import { Star, Quote } from "lucide-react";
 
 const testimonials = [
   {
-    name: "Sarah Johnson",
-    role: "Medical Student",
-    avatar: "SJ",
-    content: "ExamMaster helped me score in the 95th percentile on my MCAT. The adaptive learning technology really works!",
+    name: "Rahul Sharma",
+    role: "MCA Student",
+    avatar: "RS",
+    content: "This platform saved me hours of searching for study materials. All notes are well-organized by module and easy to download!",
     rating: 5,
   },
   {
-    name: "Michael Chen",
-    role: "Engineering Graduate",
-    avatar: "MC",
-    content: "The detailed analytics showed me exactly where I needed to improve. I passed my certification exam on the first try.",
+    name: "Priya Patel",
+    role: "BCA Final Year",
+    avatar: "PP",
+    content: "The previous year question papers helped me understand the exam pattern. I scored much better after using this resource.",
     rating: 5,
   },
   {
-    name: "Emily Rodriguez",
-    role: "Business Student",
-    avatar: "ER",
-    content: "The practice tests were incredibly similar to the actual GRE. I felt completely prepared on exam day.",
+    name: "Amit Kumar",
+    role: "BTech CS Student",
+    avatar: "AK",
+    content: "Having all subjects organized by branch and year makes it so easy to find what I need. Highly recommend for all students!",
     rating: 5,
   },
 ];
@@ -33,7 +33,7 @@ const Testimonials = () => {
             Loved by <span className="text-gradient">Students</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Join thousands of successful students who have achieved their academic goals with ExamMaster.
+            Join hundreds of students who are already using our platform to ace their exams.
           </p>
         </div>
 

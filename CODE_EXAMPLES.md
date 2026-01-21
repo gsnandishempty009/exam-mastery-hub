@@ -14,7 +14,7 @@
 UPDATE public.user_roles
 SET role = 'admin'
 WHERE user_id = (
-  SELECT id FROM auth.users WHERE email = 'newadmin@exammaster.com'
+  SELECT id FROM auth.users WHERE email = 'newadmin@studyhub.com'
 );
 ```
 
@@ -390,7 +390,7 @@ UPDATE public.user_roles
 SET role = 'admin'
 WHERE user_id IN (
   SELECT id FROM auth.users 
-  WHERE email LIKE '%@teacher.exammaster.com'
+  WHERE email LIKE '%@teacher.studyhub.com'
 );
 ```
 

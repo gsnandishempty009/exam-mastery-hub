@@ -124,7 +124,7 @@ const promoteUser = async () => {
 
 1. **Register a new account:**
    - Go to the app and click "Get Started"
-   - Register with email: admin@exammaster.com
+   - Register with email: admin@studyhub.com
    - Password: SecurePassword123
 
 2. **Get the User ID:**
@@ -144,7 +144,7 @@ WHERE user_id = 'PASTE_YOUR_USER_ID_HERE';
 
 4. **Test Admin Login:**
    - Go to Admin Login page: http://localhost:5173/admin-login
-   - Enter email: admin@exammaster.com
+   - Enter email: admin@studyhub.com
    - Enter password: SecurePassword123
    - Should redirect to /admin/dashboard
 
@@ -193,7 +193,7 @@ After promoting a user to admin, verify with:
 -- Check if user is now admin
 SELECT user_id, role FROM public.user_roles 
 WHERE user_id = (
-  SELECT id FROM auth.users WHERE email = 'admin@exammaster.com'
+  SELECT id FROM auth.users WHERE email = 'admin@studyhub.com'
 );
 -- Should return: role = 'admin'
 ```

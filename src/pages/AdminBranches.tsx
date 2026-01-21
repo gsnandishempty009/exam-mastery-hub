@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAdminProtection } from "@/hooks/useAdminProtection";
 import AdminSidebar from "@/components/dashboard/AdminSidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ interface Branch {
 }
 
 const AdminBranches = () => {
+  const { isAdmin, authLoading } = useAdminProtection();
   const [branches, setBranches] = useState<Branch[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -40,8 +42,10 @@ const AdminBranches = () => {
   const [formData, setFormData] = useState({ name: "", code: "", description: "" });
 
   useEffect(() => {
-    fetchBranches();
-  }, []);
+    if (!authLoading && isAdmin) {
+      fetchBranches();
+    }
+  }, [authLoading, isAdmin]);
 
   const fetchBranches = async () => {
     const { data, error } = await supabase.from("branches").select("*").order("name");

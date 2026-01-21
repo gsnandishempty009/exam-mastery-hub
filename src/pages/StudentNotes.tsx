@@ -55,6 +55,7 @@ interface Note {
   file_url: string;
   file_name: string;
   created_at: string;
+  pdf_url?: string | null;
 }
 
 const StudentNotes = () => {
@@ -84,14 +85,30 @@ const StudentNotes = () => {
   // Fetch branches and academic years on mount
   useEffect(() => {
     const fetchInitialData = async () => {
-      const [branchesRes, yearsRes] = await Promise.all([
-        supabase.from("branches").select("*").order("name"),
-        supabase.from("academic_years").select("*").order("year_number"),
-      ]);
+      try {
+        const [branchesRes, yearsRes] = await Promise.all([
+          supabase.from("branches").select("*").order("name"),
+          supabase.from("academic_years").select("*").order("year_number"),
+        ]);
 
-      if (branchesRes.data) setBranches(branchesRes.data);
-      if (yearsRes.data) setAcademicYears(yearsRes.data);
-      setLoading(false);
+        if (branchesRes.error) {
+          console.error("Error fetching branches:", branchesRes.error);
+        } else if (branchesRes.data) {
+          console.log("Branches fetched:", branchesRes.data);
+          setBranches(branchesRes.data);
+        }
+
+        if (yearsRes.error) {
+          console.error("Error fetching academic years:", yearsRes.error);
+        } else if (yearsRes.data) {
+          console.log("Academic years fetched:", yearsRes.data);
+          setAcademicYears(yearsRes.data);
+        }
+      } catch (err) {
+        console.error("Unexpected error fetching initial data:", err);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchInitialData();
@@ -105,14 +122,26 @@ const StudentNotes = () => {
         return;
       }
 
-      const { data } = await supabase
-        .from("subjects")
-        .select("*")
-        .eq("branch_id", selectedBranch)
-        .eq("academic_year_id", selectedYear)
-        .order("name");
+      try {
+        const { data, error } = await supabase
+          .from("subjects")
+          .select("*")
+          .eq("branch_id", selectedBranch)
+          .eq("academic_year_id", selectedYear)
+          .order("name");
 
-      setSubjects(data || []);
+        if (error) {
+          console.error("Error fetching subjects:", error);
+          setSubjects([]);
+        } else {
+          console.log("Subjects fetched:", data);
+          setSubjects(data || []);
+        }
+      } catch (err) {
+        console.error("Unexpected error fetching subjects:", err);
+        setSubjects([]);
+      }
+      
       setSelectedSubject("");
       setSelectedModule("");
       setModules([]);
@@ -130,13 +159,25 @@ const StudentNotes = () => {
         return;
       }
 
-      const { data } = await supabase
-        .from("modules")
-        .select("*")
-        .eq("subject_id", selectedSubject)
-        .order("module_number");
+      try {
+        const { data, error } = await supabase
+          .from("modules")
+          .select("*")
+          .eq("subject_id", selectedSubject)
+          .order("module_number");
 
-      setModules(data || []);
+        if (error) {
+          console.error("Error fetching modules:", error);
+          setModules([]);
+        } else {
+          console.log("Modules fetched:", data);
+          setModules(data || []);
+        }
+      } catch (err) {
+        console.error("Unexpected error fetching modules:", err);
+        setModules([]);
+      }
+      
       setSelectedModule("");
       setNotes([]);
     };
@@ -152,13 +193,24 @@ const StudentNotes = () => {
         return;
       }
 
-      const { data } = await supabase
-        .from("notes")
-        .select("*")
-        .eq("module_id", selectedModule)
-        .order("created_at", { ascending: false });
+      try {
+        const { data, error } = await supabase
+          .from("notes")
+          .select("*")
+          .eq("module_id", selectedModule)
+          .order("created_at", { ascending: false });
 
-      setNotes(data || []);
+        if (error) {
+          console.error("Error fetching notes:", error);
+          setNotes([]);
+        } else {
+          console.log("Notes fetched:", data);
+          setNotes(data || []);
+        }
+      } catch (err) {
+        console.error("Unexpected error fetching notes:", err);
+        setNotes([]);
+      }
     };
 
     fetchNotes();
@@ -346,27 +398,43 @@ const StudentNotes = () => {
           <div className="grid gap-4">
             {notes.map((note) => (
               <Card key={note.id} className="border-0 shadow-lg hover:shadow-xl transition-all">
-                <CardContent className="p-6 flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center">
-                    <FileText className="w-6 h-6 text-accent" />
+                <CardContent className="p-6 flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-4 flex-1 min-w-0">
+                    <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-6 h-6 text-accent" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold truncate">{note.title}</h4>
+                      {note.description && (
+                        <p className="text-sm text-muted-foreground truncate">{note.description}</p>
+                      )}
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {new Date(note.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold truncate">{note.title}</h4>
-                    {note.description && (
-                      <p className="text-sm text-muted-foreground truncate">{note.description}</p>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {note.pdf_url && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDownload(note.pdf_url as string, "document.pdf")}
+                        className="whitespace-nowrap"
+                      >
+                        <FileText className="w-4 h-4 mr-2" />
+                        PDF
+                      </Button>
                     )}
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {new Date(note.created_at).toLocaleDateString()}
-                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDownload(note.file_url, note.file_name)}
+                      className="whitespace-nowrap"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Download
+                    </Button>
                   </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDownload(note.file_url, note.file_name)}
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Download
-                  </Button>
                 </CardContent>
               </Card>
             ))}

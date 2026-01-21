@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAdminProtection } from "@/hooks/useAdminProtection";
 import AdminSidebar from "@/components/dashboard/AdminSidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -54,6 +55,7 @@ interface AcademicYear {
 }
 
 const AdminSubjects = () => {
+  const { isAdmin, authLoading } = useAdminProtection();
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [academicYears, setAcademicYears] = useState<AcademicYear[]>([]);
@@ -70,8 +72,10 @@ const AdminSubjects = () => {
   });
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (!authLoading && isAdmin) {
+      fetchData();
+    }
+  }, [authLoading, isAdmin]);
 
   const fetchData = async () => {
     const [subjectsRes, branchesRes, yearsRes] = await Promise.all([

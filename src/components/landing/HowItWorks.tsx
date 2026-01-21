@@ -1,29 +1,29 @@
-import { UserPlus, BookOpen, TrendingUp, Award } from "lucide-react";
+import { UserPlus, FolderOpen, BookOpen, Download } from "lucide-react";
 
 const steps = [
   {
     icon: UserPlus,
     step: "01",
     title: "Create Account",
-    description: "Sign up in seconds with your email. No credit card required to start.",
+    description: "Sign up with your email to access all study materials. It's free and takes seconds.",
+  },
+  {
+    icon: FolderOpen,
+    step: "02",
+    title: "Select Your Branch",
+    description: "Choose your academic branch like MCA, BCA, or BTech to see relevant subjects.",
   },
   {
     icon: BookOpen,
-    step: "02",
-    title: "Choose Your Exam",
-    description: "Select from hundreds of exam categories and difficulty levels.",
-  },
-  {
-    icon: TrendingUp,
     step: "03",
-    title: "Practice & Learn",
-    description: "Take practice tests, review answers, and track your improvement.",
+    title: "Browse Materials",
+    description: "Navigate through subjects and modules to find notes and question papers you need.",
   },
   {
-    icon: Award,
+    icon: Download,
     step: "04",
-    title: "Ace Your Exam",
-    description: "Walk into your real exam with confidence and achieve your goals.",
+    title: "Download & Study",
+    description: "Download study materials in PDF format and prepare for your exams effectively.",
   },
 ];
 
@@ -36,7 +36,7 @@ const HowItWorks = () => {
             How It <span className="text-gradient">Works</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Get started in minutes with our simple four-step process designed for your success.
+            Get started in minutes with our simple four-step process to access all study materials.
           </p>
         </div>
 

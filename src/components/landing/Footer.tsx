@@ -13,11 +13,11 @@ const Footer = () => {
                 <GraduationCap className="w-6 h-6 text-primary-foreground" />
               </div>
               <span className="font-display font-bold text-xl">
-                Exam<span className="text-primary">Master</span>
+                Study<span className="text-primary">Hub</span>
               </span>
             </Link>
             <p className="text-background/70 mb-6">
-              Empowering students worldwide to achieve their academic goals through smart, adaptive learning.
+              Your one-stop destination for organized study notes and previous year question papers.
             </p>
             <div className="flex gap-4">
               <a href="#" className="w-10 h-10 rounded-full bg-background/10 flex items-center justify-center hover:bg-primary transition-colors">
@@ -46,31 +46,31 @@ const Footer = () => {
             </ul>
           </div>
 
+          {/* Resources */}
+          <div>
+            <h4 className="font-display font-semibold text-lg mb-4">Resources</h4>
+            <ul className="space-y-3">
+              <li><Link to="/login" className="text-background/70 hover:text-primary transition-colors">Study Notes</Link></li>
+              <li><Link to="/login" className="text-background/70 hover:text-primary transition-colors">Question Papers</Link></li>
+              <li><Link to="/login" className="text-background/70 hover:text-primary transition-colors">Browse Branches</Link></li>
+              <li><Link to="/login" className="text-background/70 hover:text-primary transition-colors">All Subjects</Link></li>
+            </ul>
+          </div>
+
           {/* Support */}
           <div>
             <h4 className="font-display font-semibold text-lg mb-4">Support</h4>
             <ul className="space-y-3">
               <li><a href="#" className="text-background/70 hover:text-primary transition-colors">Help Center</a></li>
               <li><a href="#" className="text-background/70 hover:text-primary transition-colors">Contact Us</a></li>
-              <li><a href="#" className="text-background/70 hover:text-primary transition-colors">FAQ</a></li>
-              <li><a href="#" className="text-background/70 hover:text-primary transition-colors">Community</a></li>
-            </ul>
-          </div>
-
-          {/* Legal */}
-          <div>
-            <h4 className="font-display font-semibold text-lg mb-4">Legal</h4>
-            <ul className="space-y-3">
               <li><a href="#" className="text-background/70 hover:text-primary transition-colors">Privacy Policy</a></li>
               <li><a href="#" className="text-background/70 hover:text-primary transition-colors">Terms of Service</a></li>
-              <li><a href="#" className="text-background/70 hover:text-primary transition-colors">Cookie Policy</a></li>
-              <li><a href="#" className="text-background/70 hover:text-primary transition-colors">Licenses</a></li>
             </ul>
           </div>
         </div>
 
         <div className="pt-8 border-t border-background/10 text-center text-background/50">
-          <p>&copy; {new Date().getFullYear()} ExamMaster. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} StudyHub. All rights reserved.</p>
         </div>
       </div>
     </footer>

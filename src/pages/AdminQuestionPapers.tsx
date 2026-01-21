@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAdminProtection } from "@/hooks/useAdminProtection";
 import AdminSidebar from "@/components/dashboard/AdminSidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,8 @@ interface QuestionPaper {
   file_name: string;
   file_url: string;
   file_size: number | null;
+  pdf_url?: string;
+  pdf_file_name?: string;
   branch_id: string;
   subject_id: string | null;
 }
@@ -56,6 +59,7 @@ interface Subject {
 }
 
 const AdminQuestionPapers = () => {
+  const { isAdmin, authLoading } = useAdminProtection();
   const [papers, setPapers] = useState<QuestionPaper[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -65,6 +69,8 @@ const AdminQuestionPapers = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingPaper, setEditingPaper] = useState<QuestionPaper | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedPdfUrl, setSelectedPdfUrl] = useState<string>("");
+  const [pdfInputType, setPdfInputType] = useState<"file" | "url">("file");
   const [formData, setFormData] = useState({
     title: "",
     exam_year: new Date().getFullYear(),
@@ -74,8 +80,10 @@ const AdminQuestionPapers = () => {
   });
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (!authLoading && isAdmin) {
+      fetchData();
+    }
+  }, [authLoading, isAdmin]);
 
   useEffect(() => {
     if (formData.branch_id) {
@@ -165,6 +173,10 @@ const AdminQuestionPapers = () => {
           }
         }
 
+        if (selectedPdfUrl) {
+          updateData.pdf_url = selectedPdfUrl;
+        }
+
         const { error } = await supabase
           .from("question_papers")
           .update(updateData)
@@ -173,27 +185,44 @@ const AdminQuestionPapers = () => {
         if (error) throw error;
         toast.success("Question paper updated successfully");
       } else {
-        if (!selectedFile) {
-          toast.error("Please select a file to upload");
+        if (!selectedFile && !selectedPdfUrl) {
+          toast.error("Please either select a file to upload or provide a PDF URL");
           setUploading(false);
           return;
         }
 
-        const fileData = await uploadFile(selectedFile);
-        if (!fileData) {
-          setUploading(false);
-          return;
-        }
+        let insertData: any = {
+          ...formData,
+          subject_id: formData.subject_id || null,
+        };
 
-        const { error } = await supabase.from("question_papers").insert([
-          {
-            ...formData,
-            subject_id: formData.subject_id || null,
+        if (selectedFile) {
+          const fileData = await uploadFile(selectedFile);
+          if (!fileData) {
+            setUploading(false);
+            return;
+          }
+          insertData = {
+            ...insertData,
             file_name: fileData.name,
             file_url: fileData.url,
             file_size: fileData.size,
-          },
-        ]);
+          };
+        } else {
+          // If no file but URL provided, use a placeholder file entry
+          insertData = {
+            ...insertData,
+            file_name: "PDF from URL",
+            file_url: selectedPdfUrl,
+            file_size: null,
+          };
+        }
+
+        if (selectedPdfUrl) {
+          insertData.pdf_url = selectedPdfUrl;
+        }
+
+        const { error } = await supabase.from("question_papers").insert([insertData]);
 
         if (error) throw error;
         toast.success("Question paper uploaded successfully");
@@ -212,6 +241,8 @@ const AdminQuestionPapers = () => {
   const resetForm = () => {
     setEditingPaper(null);
     setSelectedFile(null);
+    setSelectedPdfUrl("");
+    setPdfInputType("file");
     setFormData({
       title: "",
       exam_year: new Date().getFullYear(),
@@ -223,6 +254,7 @@ const AdminQuestionPapers = () => {
 
   const handleEdit = (paper: QuestionPaper) => {
     setEditingPaper(paper);
+    setSelectedPdfUrl(paper.pdf_url || "");
     setFormData({
       title: paper.title,
       exam_year: paper.exam_year,
@@ -379,6 +411,59 @@ const AdminQuestionPapers = () => {
                     </p>
                   )}
                 </div>
+                <div className="space-y-2">
+                  <Label>PDF Link (Optional)</Label>
+                  <div className="flex gap-2 mb-2">
+                    <Button
+                      type="button"
+                      variant={pdfInputType === "file" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setPdfInputType("file")}
+                      className="flex-1"
+                    >
+                      Upload PDF File
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={pdfInputType === "url" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setPdfInputType("url")}
+                      className="flex-1"
+                    >
+                      Paste URL
+                    </Button>
+                  </div>
+                  {pdfInputType === "file" ? (
+                    <div>
+                      <Input
+                        type="file"
+                        accept=".pdf"
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files[0]) {
+                            setSelectedFile(e.target.files[0]);
+                          }
+                        }}
+                        className="cursor-pointer"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Upload a PDF file that will be stored in the system
+                      </p>
+                    </div>
+                  ) : (
+                    <div>
+                      <Input
+                        id="pdf_url"
+                        type="url"
+                        value={selectedPdfUrl}
+                        onChange={(e) => setSelectedPdfUrl(e.target.value)}
+                        placeholder="https://example.com/paper.pdf"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Enter the URL of an external PDF to link with this paper
+                      </p>
+                    </div>
+                  )}
+                </div>
                 <Button type="submit" className="w-full" disabled={uploading}>
                   {uploading ? (
                     <>
@@ -418,6 +503,7 @@ const AdminQuestionPapers = () => {
                     <TableHead>Branch</TableHead>
                     <TableHead>Subject</TableHead>
                     <TableHead>File</TableHead>
+                    <TableHead>PDF URL</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -443,6 +529,21 @@ const AdminQuestionPapers = () => {
                           View
                           <ExternalLink className="w-3 h-3" />
                         </a>
+                      </TableCell>
+                      <TableCell>
+                        {paper.pdf_url ? (
+                          <a
+                            href={paper.pdf_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-primary hover:underline"
+                          >
+                            PDF
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">-</span>
+                        )}
                       </TableCell>
                       <TableCell className="text-right">
                         <Button variant="ghost" size="sm" onClick={() => handleEdit(paper)}>

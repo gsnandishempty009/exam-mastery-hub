@@ -12,6 +12,7 @@ import StudentDashboard from "./pages/StudentDashboard";
 import StudentNotes from "./pages/StudentNotes";
 import StudentQuestionPapers from "./pages/StudentQuestionPapers";
 import StudentSettings from "./pages/StudentSettings";
+import StudentContact from "./pages/StudentContact";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminBranches from "./pages/AdminBranches";
 import AdminSubjects from "./pages/AdminSubjects";
@@ -19,6 +20,7 @@ import AdminModules from "./pages/AdminModules";
 import AdminNotes from "./pages/AdminNotes";
 import AdminQuestionPapers from "./pages/AdminQuestionPapers";
 import AdminSettings from "./pages/AdminSettings";
+import AdminContactReports from "./pages/AdminContactReports";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +40,7 @@ const App = () => (
             <Route path="/student/dashboard" element={<StudentDashboard />} />
             <Route path="/student/notes" element={<StudentNotes />} />
             <Route path="/student/question-papers" element={<StudentQuestionPapers />} />
+            <Route path="/student/contact" element={<StudentContact />} />
             <Route path="/student/settings" element={<StudentSettings />} />
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/branches" element={<AdminBranches />} />
@@ -45,6 +48,7 @@ const App = () => (
             <Route path="/admin/modules" element={<AdminModules />} />
             <Route path="/admin/notes" element={<AdminNotes />} />
             <Route path="/admin/question-papers" element={<AdminQuestionPapers />} />
+            <Route path="/admin/contact-reports" element={<AdminContactReports />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

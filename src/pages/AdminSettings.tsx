@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useAdminProtection } from "@/hooks/useAdminProtection";
 import { supabase } from "@/integrations/supabase/client";
 import AdminSidebar from "@/components/dashboard/AdminSidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -25,6 +26,7 @@ interface AdminProfileData {
 
 const AdminSettings = () => {
   const { user } = useAuth();
+  const { isAdmin, authLoading } = useAdminProtection();
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [adminProfile, setAdminProfile] = useState<AdminProfileData | null>(null);
@@ -37,10 +39,10 @@ const AdminSettings = () => {
   });
 
   useEffect(() => {
-    if (user) {
+    if (user && !authLoading && isAdmin) {
       fetchAdminProfile();
     }
-  }, [user]);
+  }, [user, authLoading, isAdmin]);
 
   const fetchAdminProfile = async () => {
     setFetching(true);

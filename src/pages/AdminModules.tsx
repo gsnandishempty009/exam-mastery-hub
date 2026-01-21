@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAdminProtection } from "@/hooks/useAdminProtection";
 import AdminSidebar from "@/components/dashboard/AdminSidebar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -46,6 +47,7 @@ interface Subject {
 }
 
 const AdminModules = () => {
+  const { isAdmin, authLoading } = useAdminProtection();
   const [modules, setModules] = useState<Module[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
@@ -59,8 +61,10 @@ const AdminModules = () => {
   });
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (!authLoading && isAdmin) {
+      fetchData();
+    }
+  }, [authLoading, isAdmin]);
 
   const fetchData = async () => {
     const [modulesRes, subjectsRes] = await Promise.all([

@@ -1,7 +1,7 @@
 # Admin Role Management Guide
 
 ## Overview
-This guide explains how to manage user roles in the ExamMaster application, specifically how to promote students to admin status.
+This guide explains how to manage user roles in the StudyHub application, specifically how to promote students to admin status.
 
 ## Database Schema
 The role management system uses two main tables:
@@ -74,7 +74,7 @@ const userRole = await roleManagement.getUserRole('USER_ID_HERE');
 ### Promote a New Admin User
 ```sql
 -- Step 1: Find user ID from email
-SELECT id FROM auth.users WHERE email = 'newadmin@exammaster.com';
+SELECT id FROM auth.users WHERE email = 'newadmin@studyhub.com';
 
 -- Step 2: Promote to admin (replace USER_ID with the result from step 1)
 UPDATE public.user_roles

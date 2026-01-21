@@ -11,6 +11,7 @@ import {
   Settings,
   LogOut,
   Shield,
+  Mail,
 } from "lucide-react";
 
 const menuItems = [
@@ -20,6 +21,7 @@ const menuItems = [
   { icon: Layers, label: "Modules", path: "/admin/modules" },
   { icon: FileText, label: "Notes", path: "/admin/notes" },
   { icon: FileQuestion, label: "Question Papers", path: "/admin/question-papers" },
+  { icon: Mail, label: "Contact Reports", path: "/admin/contact-reports" },
   { icon: Settings, label: "Settings", path: "/admin/settings" },
 ];
 
@@ -34,7 +36,7 @@ const AdminSidebar = () => {
   };
 
   // Get user initials
-  const userEmail = user?.email || "admin@exammaster.com";
+  const userEmail = user?.email || "admin@studyhub.com";
   const userName = user?.user_metadata?.full_name || userEmail.split("@")[0];
   const initials = userName
     .split(" ")
@@ -52,7 +54,7 @@ const AdminSidebar = () => {
             <GraduationCap className="w-6 h-6 text-primary-foreground" />
           </div>
           <span className="font-display font-bold text-xl">
-            Exam<span className="text-primary">Master</span>
+            Study<span className="text-primary">Hub</span>
           </span>
         </Link>
         <div className="mt-3 inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-primary/20 text-primary text-xs font-medium">

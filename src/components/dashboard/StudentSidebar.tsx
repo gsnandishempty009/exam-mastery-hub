@@ -7,6 +7,7 @@ import {
   Settings,
   LogOut,
   FileText,
+  Mail,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +16,7 @@ const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/student/dashboard" },
   { icon: BookOpen, label: "Study Notes", path: "/student/notes" },
   { icon: FileText, label: "Question Papers", path: "/student/question-papers" },
+  { icon: Mail, label: "Contact", path: "/student/contact" },
   { icon: Settings, label: "Settings", path: "/student/settings" },
 ];
 
@@ -76,7 +78,7 @@ const StudentSidebar = () => {
             <GraduationCap className="w-6 h-6 text-primary-foreground" />
           </div>
           <span className="font-display font-bold text-xl text-foreground">
-            Exam<span className="text-primary">Master</span>
+            Study<span className="text-primary">Hub</span>
           </span>
         </Link>
       </div>

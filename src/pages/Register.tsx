@@ -73,7 +73,7 @@ const Register = () => {
     } else {
       toast({
         title: "Account created!",
-        description: "Welcome to ExamMaster. Let's start learning!",
+        description: "Welcome to StudyHub. Let's start learning!",
       });
       navigate("/student/dashboard");
     }
@@ -121,7 +121,7 @@ const Register = () => {
               <GraduationCap className="w-6 h-6 text-primary-foreground" />
             </div>
             <span className="font-display font-bold text-xl text-foreground">
-              Exam<span className="text-primary">Master</span>
+              Study<span className="text-primary">Hub</span>
             </span>
           </Link>
 
@@ -250,6 +250,12 @@ const Register = () => {
               Sign in
             </Link>
           </p>
+
+          <div className="mt-6 pt-6 border-t border-border text-center">
+            <Link to="/" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+              ← Back to Homepage
+            </Link>
+          </div>
         </div>
       </div>
     </div>
