@@ -1,4 +1,4 @@
-import { FolderTree, BookOpen, FileText, Download, Search, Lock } from "lucide-react";
+import { FolderTree, BookOpen, FileText, Download, Search, Lock, Shield, Eye } from "lucide-react";
 
 const features = [
   {

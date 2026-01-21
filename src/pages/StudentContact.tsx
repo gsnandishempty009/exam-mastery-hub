@@ -7,13 +7,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, CheckCircle, Clock, AlertCircle } from "lucide-react";
+import { Mail, CheckCircle, Clock, AlertCircle, Lock } from "lucide-react";
 import StudentSidebar from "@/components/dashboard/StudentSidebar";
 
 interface ContactQuery {
   id: string;
   subject: string;
   message: string;
+  subject_code?: string;
+  semester?: string;
+  year?: string;
   admin_response: string | null;
   status: "pending" | "in-review" | "responded" | "resolved";
   created_at: string;
@@ -29,6 +32,9 @@ const StudentContact = () => {
   const [formData, setFormData] = useState({
     subject: "",
     message: "",
+    subject_code: "",
+    semester: "",
+    year: "",
   });
 
   // Fetch existing queries
@@ -88,7 +94,7 @@ const StudentContact = () => {
     if (!formData.subject.trim() || !formData.message.trim()) {
       toast({
         title: "Validation Error",
-        description: "Please fill in both subject and message",
+        description: "Please fill in subject and message fields",
         variant: "destructive",
       });
       return;
@@ -103,6 +109,9 @@ const StudentContact = () => {
             student_id: user.id,
             subject: formData.subject,
             message: formData.message,
+            subject_code: formData.subject_code || null,
+            semester: formData.semester || null,
+            year: formData.year || null,
             status: "pending",
           },
         ])
@@ -120,7 +129,7 @@ const StudentContact = () => {
 
       if (data) {
         setQueries((prev) => [data[0], ...prev]);
-        setFormData({ subject: "", message: "" });
+        setFormData({ subject: "", message: "", subject_code: "", semester: "", year: "" });
         toast({
           title: "Success",
           description: "Your query has been submitted successfully. We'll review it soon.",
@@ -179,11 +188,71 @@ const StudentContact = () => {
               <CardHeader>
                 <CardTitle>Submit a Query</CardTitle>
                 <CardDescription>
-                  Please provide details about your question or request
+                  Please provide details about your question or request. Include subject code, semester, and year for better assistance.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
+                  {/* Security & Privacy Note */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                    <div className="flex items-start gap-3">
+                      <Lock className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="font-semibold text-blue-900 mb-1">Your Data is Secure</p>
+                        <p className="text-sm text-blue-800">
+                          All your credentials and query details are encrypted and secure. Your information is only visible to authorized admin staff and is never shared with third parties.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <div>
+                      <Label htmlFor="subject_code" className="text-base font-semibold mb-2 block">
+                        Subject Code
+                      </Label>
+                      <Input
+                        id="subject_code"
+                        name="subject_code"
+                        placeholder="e.g., CS101"
+                        value={formData.subject_code}
+                        onChange={handleChange}
+                        className="h-12"
+                        disabled={isLoading}
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="semester" className="text-base font-semibold mb-2 block">
+                        Semester
+                      </Label>
+                      <Input
+                        id="semester"
+                        name="semester"
+                        placeholder="e.g., 5th Sem"
+                        value={formData.semester}
+                        onChange={handleChange}
+                        className="h-12"
+                        disabled={isLoading}
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="year" className="text-base font-semibold mb-2 block">
+                        Year
+                      </Label>
+                      <Input
+                        id="year"
+                        name="year"
+                        placeholder="e.g., 2025"
+                        value={formData.year}
+                        onChange={handleChange}
+                        className="h-12"
+                        disabled={isLoading}
+                      />
+                    </div>
+                  </div>
+
                   <div>
                     <Label htmlFor="subject" className="text-base font-semibold mb-2 block">
                       Subject
@@ -191,7 +260,7 @@ const StudentContact = () => {
                     <Input
                       id="subject"
                       name="subject"
-                      placeholder="e.g., Question about Mathematics Chapter 5"
+                      placeholder="e.g., Question about Arrays and Data Structures"
                       value={formData.subject}
                       onChange={handleChange}
                       className="h-12"
@@ -251,6 +320,28 @@ const StudentContact = () => {
                             <div className="flex items-center gap-2 mb-1">
                               <h3 className="font-semibold text-lg text-foreground">{query.subject}</h3>
                             </div>
+                            
+                            {/* Subject Details */}
+                            {(query.subject_code || query.semester || query.year) && (
+                              <div className="flex flex-wrap gap-3 mb-3 text-sm">
+                                {query.subject_code && (
+                                  <span className="bg-primary/10 text-primary px-3 py-1 rounded-full font-medium">
+                                    Code: {query.subject_code}
+                                  </span>
+                                )}
+                                {query.semester && (
+                                  <span className="bg-accent/10 text-accent px-3 py-1 rounded-full font-medium">
+                                    {query.semester}
+                                  </span>
+                                )}
+                                {query.year && (
+                                  <span className="bg-warning/10 text-warning px-3 py-1 rounded-full font-medium">
+                                    Year: {query.year}
+                                  </span>
+                                )}
+                              </div>
+                            )}
+                            
                             <p className="text-sm text-muted-foreground mb-3">
                               {new Date(query.created_at).toLocaleDateString()} at{" "}
                               {new Date(query.created_at).toLocaleTimeString()}

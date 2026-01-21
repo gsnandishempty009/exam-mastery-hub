@@ -21,6 +21,10 @@ import AdminNotes from "./pages/AdminNotes";
 import AdminQuestionPapers from "./pages/AdminQuestionPapers";
 import AdminSettings from "./pages/AdminSettings";
 import AdminContactReports from "./pages/AdminContactReports";
+import AdminIssueReports from "./pages/AdminIssueReports";
+import HelpCenter from "./pages/HelpCenter";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,7 +53,11 @@ const App = () => (
             <Route path="/admin/notes" element={<AdminNotes />} />
             <Route path="/admin/question-papers" element={<AdminQuestionPapers />} />
             <Route path="/admin/contact-reports" element={<AdminContactReports />} />
+            <Route path="/admin/issue-reports" element={<AdminIssueReports />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
+            <Route path="/help" element={<HelpCenter />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-service" element={<TermsOfService />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

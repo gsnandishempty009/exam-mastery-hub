@@ -12,6 +12,7 @@ import {
   LogOut,
   Shield,
   Mail,
+  AlertCircle,
 } from "lucide-react";
 
 const menuItems = [
@@ -22,6 +23,7 @@ const menuItems = [
   { icon: FileText, label: "Notes", path: "/admin/notes" },
   { icon: FileQuestion, label: "Question Papers", path: "/admin/question-papers" },
   { icon: Mail, label: "Contact Reports", path: "/admin/contact-reports" },
+  { icon: AlertCircle, label: "Issue Reports", path: "/admin/issue-reports" },
   { icon: Settings, label: "Settings", path: "/admin/settings" },
 ];
 
