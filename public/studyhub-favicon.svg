@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Background -->
+  <rect width="200" height="200" fill="#4F46E5" rx="40"/>
+  
+  <!-- StudyHub Badge Background -->
+  <circle cx="100" cy="100" r="85" fill="#5B5EEA"/>
+  
+  <!-- Graduation Cap -->
+  <g transform="translate(50, 60)">
+    <!-- Cap top -->
+    <path d="M 50 0 L 100 20 L 50 30 L 0 20 Z" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="1"/>
+    <!-- Cap brim -->
+    <ellipse cx="50" cy="30" rx="50" ry="8" fill="#FFFFFF"/>
+    <!-- Tassel -->
+    <line x1="50" y1="30" x2="50" y2="60" stroke="#FFD700" stroke-width="2"/>
+    <circle cx="50" cy="65" r="5" fill="#FFD700"/>
+  </g>
+  
+  <!-- Book -->
+  <g transform="translate(60, 85)">
+    <!-- Book spine -->
+    <rect x="15" y="5" width="30" height="45" fill="#FFFFFF" rx="2"/>
+    <!-- Left page -->
+    <rect x="0" y="5" width="15" height="45" fill="#E0E7FF" rx="2"/>
+    <!-- Right page -->
+    <rect x="45" y="5" width="15" height="45" fill="#E0E7FF" rx="2"/>
+    <!-- Pages lines -->
+    <line x1="5" y1="15" x2="10" y2="15" stroke="#4F46E5" stroke-width="1"/>
+    <line x1="5" y1="22" x2="10" y2="22" stroke="#4F46E5" stroke-width="1"/>
+    <line x1="5" y1="29" x2="10" y2="29" stroke="#4F46E5" stroke-width="1"/>
+    <line x1="50" y1="15" x2="55" y2="15" stroke="#4F46E5" stroke-width="1"/>
+    <line x1="50" y1="22" x2="55" y2="22" stroke="#4F46E5" stroke-width="1"/>
+    <line x1="50" y1="29" x2="55" y2="29" stroke="#4F46E5" stroke-width="1"/>
+  </g>
+</svg>
