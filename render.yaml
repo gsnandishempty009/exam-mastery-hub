@@ -1,0 +1,6 @@
+routes:
+  - path: "/*"
+    methods:
+      - GET
+      - HEAD
+    dest: /index.html
