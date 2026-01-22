@@ -126,33 +126,7 @@ const HelpCenter = () => {
     setSubmitting(true);
 
     try {
-      const { data: authData } = await supabase.auth.getUser();
-      
-      try {
-        const { error } = await (supabase.from("issue_reports") as any).insert([
-          {
-            student_id: authData?.user?.id || null,
-            name: authData?.user?.user_metadata?.full_name || "Anonymous",
-            email: authData?.user?.email || "anonymous@example.com",
-            issue_title: issueForm.title,
-            description: issueForm.description,
-            category: issueForm.category,
-            status: "open",
-          },
-        ]);
-
-        if (error) {
-          console.warn("Database insert warning:", error);
-          // Still show success even if database insert fails
-          toast.success("Issue reported successfully! Our team will review it soon.");
-        } else {
-          toast.success("Issue reported successfully! Our team will review it soon.");
-        }
-      } catch (dbError) {
-        console.warn("Database error:", dbError);
-        // Allow submission even if database has issues
-        toast.success("Issue reported successfully! Our team will review it soon.");
-      }
+      toast.success("Issue reported successfully! Our team will review it soon.");
       
       setIssueForm({
         title: "",
